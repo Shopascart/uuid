@@ -80,7 +80,7 @@ export class UniqueID implements IUniqueID {
             val[i] = this.ALPHANUMERIC.charAt(Math.floor(Math.random() * charsLength));
         }
         if (this.type === "string") {
-            const unique = this.prefix ? `${this.prefix}_${uuid}_${timestamp}_${randomNum}_${rnd}` : `${uuid}_${timestamp}_${randomNum}_${rnd}`;
+            const unique = this.prefix ? `${this.prefix}_${uuid}${timestamp}${randomNum}${rnd}` : `${uuid}${timestamp}${randomNum}${rnd}`;
             const uniqueID = unique.substring(0, length ? length : 16);
             return uniqueID;
         } else {
