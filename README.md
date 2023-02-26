@@ -36,6 +36,12 @@ The `test` method tests the uniqueness of the unique ID algorithm by generating 
 
 The `duplicates` method checks for duplicates in an array of unique IDs. It takes an array of unique IDs as its parameter and returns an object that contains the status of the unique ID, the cases of duplicates, and the duplicates.
 
+<pre class="highlight plaintext"><code>ord_5BOElwUNzRQjm3AC9ks9H                     260147348
+└──┘└───────────────────┘                     └───────┘
+ └─ Prefix └─ Generated Random Characters         └─ Generated Random Number
+</code></pre>
+
+
 ## Installation
 ```
 npm install @shopascart/uuid
@@ -50,3 +56,5 @@ const uniqueID = uuid.generate();
 ```
 ## Limitations
 The algorithm may have collisions (i.e., generate the same ID twice) in extremely rare cases. The probability of a collision is extremely low, but it is not zero. The algorithm is still in development and may be improved in the future.
+
+
