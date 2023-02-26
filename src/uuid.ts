@@ -194,7 +194,7 @@ export const UUID = (options?: IUUIDOptions): {
     const methods = {
         generate: () => {
             const uniqueID = new UniqueID(options?.prefix ? options.prefix : "", options?.type ? options.type : "string");
-            return uniqueID.generate(length ? length : 16);
+            return uniqueID.generate(options?.length ? options.length : 16);
         },
         test: () => {
             const uniqueID = new UniqueID();
