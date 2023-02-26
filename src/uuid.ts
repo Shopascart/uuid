@@ -119,14 +119,24 @@ export class UniqueID implements IUniqueID {
                 }
             }
         }
-        // get the duplicates
-        const c = array.filter((element, index) => array.indexOf(element) !== index)
-        duplicates.push(...c);
-        const status = duplicates.length === 0 ? false : true;
-        return {
-            status,
-            cases,
-            duplicates
+        let sorted_arr = array.slice().sort();
+        for (let i = 0; i < sorted_arr.length - 1; i++) {
+            if (sorted_arr[i + 1] == sorted_arr[i]) {
+                duplicates.push(sorted_arr[i]);
+            }
+        }
+        if (duplicates.length === 0) {
+            return {
+                status: false,
+                cases: cases,
+                duplicates: duplicates
+            }
+        } else {
+            return {
+                status: true,
+                cases: cases,
+                duplicates: duplicates
+            }
         }
     }
 
