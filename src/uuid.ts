@@ -108,7 +108,6 @@ export class UniqueID implements IUniqueID {
         cases?: Array<string>,
         duplicates?: Array<number | string>
     } {
-        const unique = Array.from(new Set(array));
         const cases = [];
         const duplicates = [];
         if (getCases) {
@@ -123,18 +122,11 @@ export class UniqueID implements IUniqueID {
         // get the duplicates
         const c = array.filter((element, index) => array.indexOf(element) !== index)
         duplicates.push(...c);
-        if (unique.length === array.length) {
-            return {
-                status: true,
-                cases: cases,
-                duplicates: duplicates
-            }
-        } else {
-            return {
-                status: false,
-                cases: cases,
-                duplicates: duplicates
-            }
+        const status = duplicates.length === 0 ? false : true;
+        return {
+            status,
+            cases,
+            duplicates
         }
     }
 
