@@ -25,7 +25,7 @@ export interface IUniqueID {
      * @param {number} length - The length of the unique ID to be generated
      * @returns {string | number} - A unique ID
      */
-    generate(length?: number): string | number;
+    generate<T>(length?: number): T;
     /**
      * A method that tests the accuracy of the unique ID algorithm
      * @returns {boolean} A boolean value that indicates whether the unique ID algorithm is accurate
@@ -69,7 +69,7 @@ export class UniqueID implements IUniqueID {
         this.prefix = prefix ? prefix : "";
         this.type = type ? type : "string";
     }
-    public generate(length?: number): string | number {
+    public generate<T = string>(length?: number): T {
         const rnd = RandomBits(1)[0];
         const timestamp = new Date().getTime();
         const val = new Array(length ? length : 8);
@@ -82,19 +82,19 @@ export class UniqueID implements IUniqueID {
         if (this.type === "string") {
             const unique = this.prefix ? `${this.prefix}_${uuid}${timestamp}${randomNum}${rnd}` : `${uuid}${timestamp}${randomNum}${rnd}`;
             const uniqueID = unique.substring(0, length ? length : 16);
-            return uniqueID;
+            return uniqueID as string as T;
         } else {
             const r = Math.floor(Math.random() * 1000000000);
             const result = `${r}${timestamp}${randomNum}${rnd}`;
             const uniqueID = Number(result.substring(0, length));
-            return uniqueID;
+            return uniqueID as number as T;
         }
     }
     public testUniqueID(): boolean {
         const ids = new Set<string | number>();
         const length = 100000;
         for (let i = 0; i < length; i++) {
-            const id = this.generate();
+            const id = this.generate<string>();
             if (ids.has(id)) {
                 return false;
             }
@@ -157,7 +157,7 @@ export type IUUIDOptions = {
     length?: number
 }
 
-
+type PickTYpe<T, K extends keyof T> = T[K];
 
 /**
  * A wrapper function for the UniqueID class that provides a set of methods for generating and testing unique IDs
@@ -176,7 +176,7 @@ export const UUID = (options?: IUUIDOptions): {
      *  The generate method generates a unique ID based on the options provided. If no options are provided, it generates a unique ID with a length of 16 characters and a type of "string"
      * @returns {string | number} A unique ID
      */
-    generate: () => string | number
+    generate: <T >() => T
     /**
      * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
      * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
@@ -194,9 +194,9 @@ export const UUID = (options?: IUUIDOptions): {
     }
 } => {
     const methods = {
-        generate: () => {
+        generate: <T = string>() => {
             const uniqueID = new UniqueID(options?.prefix ? options.prefix : "", options?.type ? options.type : "string");
-            return uniqueID.generate(options?.length ? options.length : 16);
+            return uniqueID.generate<T>(options?.length ? options.length : 16);
         },
         test: () => {
             const uniqueID = new UniqueID();
@@ -212,3 +212,4 @@ export const UUID = (options?: IUUIDOptions): {
 
 
 export default UUID;
+const id = UUID({ type: "number", length: 14 }).generate();
