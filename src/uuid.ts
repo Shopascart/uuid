@@ -21,11 +21,22 @@ export const HexRandomBytes = (size: number): string => {
 
 export interface IUniqueID {
     /**
+     * Prefix to be added to the unique ID
+    */
+    prefix?: string;
+    /**
+     * The type of unique ID to be generated. It can be either "string" or "number"
+     * @default "string"    
+     * */
+    type?: "string" | "number";
+    /**
      * Generate a unique ID
      * @param {number} length - The length of the unique ID to be generated
      * @returns {string | number} - A unique ID
      */
-    generate<T>(length?: number): T;
+    generate(length?: number): IUniqueID['type'] extends "string" ? string : number
+    generate(length?: number): IUniqueID['type'] extends "number" ? number : string
+    generate(length?: number): string | number;
     /**
      * A method that tests the accuracy of the unique ID algorithm
      * @returns {boolean} A boolean value that indicates whether the unique ID algorithm is accurate
@@ -34,21 +45,6 @@ export interface IUniqueID {
      * const status = uniqueID.testUniqueID(); // true
      **/
     testUniqueID(): boolean;
-    /**
-     * A method that checks for duplicates in an array of unique IDs
-     * @param {Array<number | string>} array - An array of unique IDs
-     * @param {boolean} getCases - A boolean value that indicates whether to get the cases of duplicates
-     * @returns {Object} An object that contains the status of the duplicates, the cases of duplicates and the duplicates
-     * @example
-     * const uniqueID = new UniqueID();
-     * const array = [uniqueID.generate(), uniqueID.generate(), uniqueID.generate()];
-     * const { status, cases, duplicates } = uniqueID.dupilcates(array); // { status: true, cases: [], duplicates: [] }
-     **/
-    dupilcates(array: Array<number | string>): {
-        status: boolean,
-        cases?: Array<string>,
-        duplicates?: Array<number | string>
-    };
 }
 
 /**
@@ -62,14 +58,16 @@ export interface IUniqueID {
  */
 
 export class UniqueID implements IUniqueID {
-    private readonly prefix: string;
-    private readonly type: "string" | "number";
+    readonly prefix: string;
+    readonly type: "string" | "number";
     private ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     constructor(prefix?: string, type?: "string" | "number") {
         this.prefix = prefix ? prefix : "";
         this.type = type ? type : "string";
     }
-    public generate<T = string>(length?: number): T {
+    generate(length?: number): IUniqueID['type'] extends "string" ? string : number
+    generate(length?: number): IUniqueID['type'] extends "number" ? number : string
+    public generate(length?: number): string | number {
         const rnd = RandomBits(1)[0];
         const timestamp = new Date().getTime();
         const val = new Array(length ? length : 8);
@@ -82,19 +80,19 @@ export class UniqueID implements IUniqueID {
         if (this.type === "string") {
             const unique = this.prefix ? `${this.prefix}_${uuid}${timestamp}${randomNum}${rnd}` : `${uuid}${timestamp}${randomNum}${rnd}`;
             const uniqueID = unique.substring(0, length ? length : 16);
-            return uniqueID as string as T;
+            return uniqueID as string;
         } else {
             const r = Math.floor(Math.random() * 1000000000);
             const result = `${r}${timestamp}${randomNum}${rnd}`;
             const uniqueID = Number(result.substring(0, length));
-            return uniqueID as number as T;
+            return uniqueID as number;
         }
     }
     public testUniqueID(): boolean {
         const ids = new Set<string | number>();
         const length = 100000;
         for (let i = 0; i < length; i++) {
-            const id = this.generate<string>();
+            const id = this.generate();
             if (ids.has(id)) {
                 return false;
             }
@@ -140,7 +138,7 @@ export class UniqueID implements IUniqueID {
         }
     }
 
-    public dupilcates(array: Array<number | string>): {
+    private duplicates(array: Array<number | string>): {
         status: boolean,
         cases?: Array<string>,
         duplicates?: Array<number | string>
@@ -151,13 +149,24 @@ export class UniqueID implements IUniqueID {
 
 
 
-export type IUUIDOptions = {
+export type TUUIDOptions = {
     type?: "string" | "number",
     prefix?: string,
     length?: number
 }
 
-type PickTYpe<T, K extends keyof T> = T[K];
+
+type TString = {
+    generate(): string,
+    test(): boolean,
+}
+type TNumber = {
+    generate(): number,
+    test(): boolean,
+}
+
+type TUUID = TString | TNumber
+
 
 /**
  * A wrapper function for the UniqueID class that provides a set of methods for generating and testing unique IDs
@@ -170,46 +179,24 @@ type PickTYpe<T, K extends keyof T> = T[K];
   * const id = UUID({ type: "string", prefix: "prefix", length: 10 }).generate();
  * @returns {Object} An object that contains the methods for generating unique IDs, testing unique IDs and checking for duplicates
  */
-
-export const UUID = (options?: IUUIDOptions): {
-    /**
-     *  The generate method generates a unique ID based on the options provided. If no options are provided, it generates a unique ID with a length of 16 characters and a type of "string"
-     * @returns {string | number} A unique ID
-     */
-    generate: <T >() => T
-    /**
-     * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
-     * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
-    */
-    test(): boolean
-    /**
-     * The duplicates method checks for duplicates in an array of unique IDs
-     * @param {Array<number | string>} array - An array of unique IDs
-     * @returns {Object} An object that contains the status of the unique ID, the cases of duplicates and the duplicates
-     */
-    duplicates(array: Array<number | string>): {
-        status: boolean,
-        cases?: Array<string>,
-        duplicates?: Array<number | string>
+function UUID(options: TUUIDOptions & { type: "string" }): TString
+function UUID(options: TUUIDOptions & { type: "number" }): TNumber
+function UUID(): TString
+function UUID(options?: TUUIDOptions): TUUID
+function UUID(options?: TUUIDOptions): TUUID {
+    const uniqueID = new UniqueID(options?.prefix, options?.type);
+    return {
+        /**
+         * The generate method generates a unique ID based on the options provided. If no options are provided, it generates a unique ID with a length of 16    characters and a type of "string"
+         * @returns {string | number} A unique ID
+        */
+        generate: () => uniqueID.generate(options?.length),
+        /**
+        * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
+        * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
+        */
+        test: () => uniqueID.testUniqueID(),
     }
-} => {
-    const methods = {
-        generate: <T = string>() => {
-            const uniqueID = new UniqueID(options?.prefix ? options.prefix : "", options?.type ? options.type : "string");
-            return uniqueID.generate<T>(options?.length ? options.length : 16);
-        },
-        test: () => {
-            const uniqueID = new UniqueID();
-            return uniqueID.testUniqueID();
-        },
-        duplicates: (array: Array<number | string>) => {
-            const uniqueID = new UniqueID();
-            return uniqueID.dupilcates(array);
-        }
-    }
-    return methods
 }
 
-
 export default UUID;
-const id = UUID({ type: "number", length: 14 }).generate();

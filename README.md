@@ -28,13 +28,11 @@ For number identifiers, the elements are concatenated into a single string in th
 To ensure the uniqueness of the generated identifiers, the algorithm uses a Set data structure to keep track of generated identifiers and checks for duplicates. The test() method generates 100,000 identifiers and checks for duplicates, returning true if all generated identifiers are unique, and false if there are any duplicates.
 
 
-The UniqueID algorithm provides a `UUID` wrapper function that exposes three methods: generate, test, and duplicates. The UUID function is a wrapper function to the UniqueID class. It provides a more user-friendly interface for generating and testing unique IDs by exposing three methods: generate, test, and duplicates. These methods internally call the corresponding methods of the UniqueID class and provide the necessary options and parameters. The function takes an optional options parameter that can be used to configure the prefix, length, and type of the unique ID.
+The UniqueID algorithm provides a `UUID` wrapper function that exposes three methods: generate, test, and duplicates. The UUID function is a wrapper function to the UniqueID class. It provides a more user-friendly interface for generating and testing unique IDs by exposing two methods: generate and test. These methods internally call the corresponding methods of the UniqueID class and provide the necessary options and parameters. The function takes an optional options parameter that can be used to configure the prefix, length, and type of the unique ID.
 
 The `generate` method generates a unique ID based on the options provided, or by default, generates a unique ID with a length of 16 characters and a type of "string". It returns the generated unique ID.
 
 The `test` method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates. It returns a boolean that indicates whether the list of generated unique IDs are unique or not.
-
-The `duplicates` method checks for duplicates in an array of unique IDs. It takes an array of unique IDs as its parameter and returns an object that contains the status of the unique ID, the cases of duplicates, and the duplicates.
 
 <pre class="highlight plaintext"><code>ord_5BOElwUNzRQjm3AC9ks9H                     260147348
 └──┘└───────────────────┘                     └───────┘
