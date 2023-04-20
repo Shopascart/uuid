@@ -181,10 +181,13 @@ type TUUID = TString | TNumber
  */
 function UUID(options: TUUIDOptions & { type: "string" }): TString
 function UUID(options: TUUIDOptions & { type: "number" }): TNumber
+function UUID(options: TUUIDOptions & { length: number }): TString
+function UUID(options: TUUIDOptions & { prefix: string }): TString
+function UUID({}: {}): TString
 function UUID(): TString
 function UUID(options?: TUUIDOptions): TUUID
 function UUID(options?: TUUIDOptions): TUUID {
-    const uniqueID = new UniqueID(options?.prefix, options?.type);
+    const uniqueID = new UniqueID(options?.prefix || "", options && options.type ? options.type : "string");
     return {
         /**
          * The generate method generates a unique ID based on the options provided. If no options are provided, it generates a unique ID with a length of 16    characters and a type of "string"
@@ -200,3 +203,4 @@ function UUID(options?: TUUIDOptions): TUUID {
 }
 
 export default UUID;
+const id = UUID().generate();
