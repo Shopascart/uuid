@@ -25,10 +25,8 @@ For string identifiers, the elements are combined into a single string in the fo
 
 For number identifiers, the elements are concatenated into a single string in the following format: [randomNumber][timestamp][randomBit]. The resulting string is then converted to a number and truncated to the desired length specified in the constructor.
 
-To ensure the uniqueness of the generated identifiers, the algorithm uses a Set data structure to keep track of generated identifiers and checks for duplicates. The test() method generates 100,000 identifiers and checks for duplicates, returning true if all generated identifiers are unique, and false if there are any duplicates.
 
-
-The UniqueID algorithm provides a `UUID` wrapper function that exposes three methods: generate, test, and duplicates. The UUID function is a wrapper function to the UniqueID class. It provides a more user-friendly interface for generating and testing unique IDs by exposing two methods: generate and test. These methods internally call the corresponding methods of the UniqueID class and provide the necessary options and parameters. The function takes an optional options parameter that can be used to configure the prefix, length, and type of the unique ID.
+The UniqueID algorithm provides a `UUID` wrapper function that exposes two methods: generate and test. The UUID function is a wrapper function to the UniqueID class. It provides a more user-friendly interface for generating and testing unique IDs by exposing two methods: generate and test. These methods internally call the corresponding methods of the UniqueID class and provide the necessary options and parameters. The function takes an optional options parameter that can be used to configure the prefix, length, and type of the unique ID.
 
 The `generate` method generates a unique ID based on the options provided, or by default, generates a unique ID with a length of 16 characters and a type of "string". It returns the generated unique ID.
 
@@ -54,5 +52,4 @@ const uniqueID = uuid.generate();
 ```
 ## Limitations
 The algorithm may have collisions (i.e., generate the same ID twice) in extremely rare cases. The probability of a collision is extremely low, but it is not zero. The algorithm is still in development and may be improved in the future.
-
 

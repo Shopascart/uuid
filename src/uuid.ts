@@ -203,4 +203,3 @@ function UUID(options?: TUUIDOptions): TUUID {
 }
 
 export default UUID;
-const id = UUID().generate();
