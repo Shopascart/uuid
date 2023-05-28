@@ -1,6 +1,6 @@
 {
     "name": "@shopascart/uuid",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "A uuid generator",
     "main": "dist/cjs/index.js",
     "module": "dist/ts/index.js",
@@ -38,5 +38,8 @@
     "bugs": {
         "url": "https://github.com/Shopascart/uuid/issues"
     },
-    "homepage": "https://github.com/Shopascart/uuid/#readme"
+    "homepage": "https://github.com/Shopascart/uuid/#readme",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
 }

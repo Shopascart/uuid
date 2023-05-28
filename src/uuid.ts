@@ -177,7 +177,7 @@ type TUUID = TString | TNumber
   * const id = UUID().generate();
   * const id = UUID({ type: "number", length: 14 }).generate();
   * const id = UUID({ type: "string", prefix: "prefix", length: 10 }).generate();
- * @returns {Object} An object that contains the methods for generating unique IDs, testing unique IDs and checking for duplicates
+ * @returns {Object} An object that contains the methods for generating unique IDs and testing the accuracy of the unique ID algorithm
  */
 function UUID(options: TUUIDOptions & { type: "string" }): TString
 function UUID(options: TUUIDOptions & { type: "number" }): TNumber
