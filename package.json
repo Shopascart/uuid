@@ -11,7 +11,7 @@
         "dist": "dist"
     },
     "scripts": {
-        "build": "npm run build:ts && npm run build:cjs",
+        "build": "rm -rf dist && npm run build:ts && npm run build:cjs",
         "build:ts": "tsc",
         "build:cjs": "tsc --module CommonJS --outDir dist/cjs",
         "prepublishOnly": "npm run build",
