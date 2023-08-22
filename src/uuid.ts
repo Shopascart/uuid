@@ -88,6 +88,19 @@ export class UniqueID implements IUniqueID {
             return uniqueID as number;
         }
     }
+    
+    // generateV4<Prefix extends string ="-">({ prefix, type }: { prefix: Prefix, type: "random" }): `${string}${Prefix}${string}${Prefix}${string}${Prefix}${string}`
+    // generateV4<Prefix extends string ="-">({ prefix, type }: { prefix: Prefix, type: "string" }): `${string}${Prefix}${string}${Prefix}${string}${Prefix}${string}`
+    // generateV4<Prefix extends string ="-">({ prefix, type }: { prefix: Prefix, type: "number" }): `${number}${Prefix}${number}${Prefix}${number}${Prefix}${number}`
+    // generateV4({ type}: { type: "random" }): `${string}_${string}_${string}_${string}`;
+    // generateV4({ type}: { type: "string" }): `${string}_${string}_${string}_${string}`;
+    // generateV4({ type}: { type: "number" }): `${number}_${number}_${number}_${number}`;
+    // generateV4(): `${string}_${string}_${string}_${string}`;
+    // generateV4({}: {}): `${string}_${string}_${string}_${string}`;
+
+    // public generateV4<Prefix extends string ="-", Type extends "random" | "string" | "number" = "random">(options?: { prefix?: Prefix, type?: Type, length?: number }): `${string}${Prefix}${string}${Prefix}${string}${Prefix}${string}` | `${number}${Prefix}${number}${Prefix}${number}${Prefix}${number}` {
+        
+    // }
     public testUniqueID(): boolean {
         const ids = new Set<string | number>();
         const length = 100000;
@@ -149,15 +162,15 @@ export class UniqueID implements IUniqueID {
 
 
 
-export type TUUIDOptions = {
+export type TUUIDOptions<Prefix extends string> = {
     type?: "string" | "number",
-    prefix?: string,
+    prefix?: Prefix,
     length?: number
 }
 
 
-type TString = {
-    generate(): string,
+type TString<Prefix extends string> = {
+    generate(): `${Prefix}_${string}`,
     test(): boolean,
 }
 type TNumber = {
@@ -165,7 +178,7 @@ type TNumber = {
     test(): boolean,
 }
 
-type TUUID = TString | TNumber
+type TUUID<Prefix extends string> = TString<Prefix> | TNumber
 
 
 /**
@@ -179,21 +192,20 @@ type TUUID = TString | TNumber
   * const id = UUID({ type: "string", prefix: "prefix", length: 10 }).generate();
  * @returns {Object} An object that contains the methods for generating unique IDs and testing the accuracy of the unique ID algorithm
  */
-function UUID(options: TUUIDOptions & { type: "string" }): TString
-function UUID(options: TUUIDOptions & { type: "number" }): TNumber
-function UUID(options: TUUIDOptions & { length: number }): TString
-function UUID(options: TUUIDOptions & { prefix: string }): TString
-function UUID({}: {}): TString
-function UUID(): TString
-function UUID(options?: TUUIDOptions): TUUID
-function UUID(options?: TUUIDOptions): TUUID {
+function UUID<Prefix extends string>(options: TUUIDOptions<Prefix> & { type: "number", prefix: Prefix }): TString<Prefix>
+function UUID<Prefix extends string>(options: TUUIDOptions<Prefix> & { type: "number" }): TNumber
+function UUID<Prefix extends string>(options: TUUIDOptions<Prefix> & { type: "string" }): TString<Prefix>
+function UUID({ }: {}): TString<string>
+function UUID(): TString<string>
+function UUID<Prefix extends string>(options: TUUIDOptions<Prefix> & { prefix?: Prefix }): TString<Prefix>
+function UUID<Prefix extends string>(options?: TUUIDOptions<Prefix>): TUUID<Prefix> {
     const uniqueID = new UniqueID(options?.prefix || "", options && options.type ? options.type : "string");
     return {
         /**
          * The generate method generates a unique ID based on the options provided. If no options are provided, it generates a unique ID with a length of 16    characters and a type of "string"
          * @returns {string | number} A unique ID
         */
-        generate: () => uniqueID.generate(options?.length),
+        generate: () => uniqueID.generate(options?.length) as any,
         /**
         * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
         * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
@@ -202,4 +214,6 @@ function UUID(options?: TUUIDOptions): TUUID {
     }
 }
 
+
+const req_id = UUID().generate();
 export default UUID;
