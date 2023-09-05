@@ -1,6 +1,6 @@
 {
     "name": "@shopascart/uuid",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "A uuid generator",
     "main": "dist/cjs/index.js",
     "module": "dist/ts/index.js",
