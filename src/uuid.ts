@@ -126,7 +126,7 @@ export class UniqueID implements IUniqueID {
             return uniqueID as number;
         }
     }
-    
+
     // generateV4<Prefix extends string ="-">({ prefix, type }: { prefix: Prefix, type: "random" }): `${string}${Prefix}${string}${Prefix}${string}${Prefix}${string}`
     // generateV4<Prefix extends string ="-">({ prefix, type }: { prefix: Prefix, type: "string" }): `${string}${Prefix}${string}${Prefix}${string}${Prefix}${string}`
     // generateV4<Prefix extends string ="-">({ prefix, type }: { prefix: Prefix, type: "number" }): `${number}${Prefix}${number}${Prefix}${number}${Prefix}${number}`
@@ -137,7 +137,7 @@ export class UniqueID implements IUniqueID {
     // generateV4({}: {}): `${string}_${string}_${string}_${string}`;
 
     // public generateV4<Prefix extends string ="-", Type extends "random" | "string" | "number" = "random">(options?: { prefix?: Prefix, type?: Type, length?: number }): `${string}${Prefix}${string}${Prefix}${string}${Prefix}${string}` | `${number}${Prefix}${number}${Prefix}${number}${Prefix}${number}` {
-        
+
     // }
     public testUniqueID(): boolean {
         const ids = new Set<string | number>();
@@ -208,11 +208,27 @@ export type TUUIDOptions<Prefix extends string> = {
 
 
 type TString<Prefix extends string> = {
+    /**
+        * Generate a unique ID
+        * @returns {string} - A unique ID with the specified prefix
+    */
     generate(): `${Prefix}_${string}`,
+    /**
+        * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
+        * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
+    */
     test(): boolean,
 }
 type TNumber = {
+     /**
+        * Generate a unique ID
+        * @returns {number} - A unique ID
+    */
     generate(): number,
+     /**
+        * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
+        * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
+    */
     test(): boolean,
 }
 
@@ -252,6 +268,4 @@ function UUID<Prefix extends string>(options?: TUUIDOptions<Prefix>): TUUID<Pref
     }
 }
 
-
-const req_id = UUID().generate();
 export default UUID;
