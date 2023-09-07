@@ -21,7 +21,6 @@ export const randomBytes = (size: number): {
         randomBytes[i] = Math.floor(Math.random() * 256);
     }
     const toString = (type: "hex") => {
-        // no buffer support
         let res = '';
         if (type === "hex") {
             const len = randomBytes.length;
@@ -83,6 +82,13 @@ export interface IUniqueID {
      * const status = uniqueID.testUniqueID(); // true
      **/
     testUniqueID(): boolean;
+    /**
+     * The `runUUID` function generates a large number of unique IDs and checks for duplicates. It also
+     * measures the time taken to generate the unique IDs.
+     * @param - An object that contains the length of the unique ID to be generated and the number of unique IDs to be generated.
+     * If the `idsLength` property is not provided, it defaults to 100000.
+     */
+    runUUID({ length, idsLength }: { length?: number, idsLength?: number }): void
 }
 
 /**
@@ -108,7 +114,7 @@ export class UniqueID implements IUniqueID {
     public generate(length?: number): string | number {
         const rnd = RandomBits(1)[0];
         const timestamp = new Date().getTime();
-        const val = new Array(length ? length : 8);
+        const val = new Array(length ? length : 24);
         const charsLength = this.ALPHANUMERIC.length;
         const randomNum = Math.floor((Math.random() * 100000000) * 0x100000000);
         const uuid = HexRandomBytes(16);
@@ -196,40 +202,85 @@ export class UniqueID implements IUniqueID {
     } {
         return this.checkUniqueIDDuplicates(array, true);
     }
+
+    public runUUID({ length, idsLength }: { length?: number, idsLength?: number } = {}): void {
+        const uniqueID = new UniqueID(this.prefix, this.type);
+        const ids = new Set<string | number>();
+        const start = new Date().getTime();
+        const len = idsLength ? idsLength : 100000;
+        console.log("Start time: ", `${start}ms`);
+        for (let i = 0; i < len; i++) {
+            const id = uniqueID.generate(length ?? 24);
+            if (ids.has(id)) {
+                console.log("Duplicate: ", id);
+                break;
+            }
+            ids.add(id);
+        }
+        const end = new Date().getTime();
+        console.log("End time: ", `${end}ms`);
+        console.log("Time taken: ", `${(end - start)}ms`);
+        console.log("Number of unique IDs generated: ", ids.size);
+    }
 }
 
 
 
 export type TUUIDOptions<Prefix extends string> = {
+    // So it has been discoverd that the type number is not unique when generating a large number of unique IDs so it is recommended to use the type string for now
+    /**
+     * The type of unique ID to be generated. It can be either "string" or "number"
+     * **Note**: The type number is not unique when generating a large number of unique IDs so it is recommended to use the type string for now 
+     * */
     type?: "string" | "number",
+    /**
+     * Prefix to be added to the unique ID
+    */
     prefix?: Prefix,
+    /**
+     * The length of the unique ID to be generated. It defaults to 24
+     */
     length?: number
 }
 
 
 type TString<Prefix extends string> = {
     /**
-        * Generate a unique ID
-        * @returns {string} - A unique ID with the specified prefix
+        * Generates a unique ID
+        * @returns {string} - A unique ID with the specified prefix and length
     */
     generate(): `${Prefix}_${string}`,
     /**
-        * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
+        * The test method can be used to test the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
         * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
     */
     test(): boolean,
+    /**
+     * The `runUUID` function generates a large number of unique IDs and checks for duplicates. It also
+     * measures the time taken to generate the unique IDs.
+     * @param - `idsLength` an optional parameter which specifies the number of
+     * unique IDs to generate. If `idsLength` is not provided, it defaults to 100000.
+     */
+    runUUID(idsLength?: number): void
 }
 type TNumber = {
-     /**
-        * Generate a unique ID
-        * @returns {number} - A unique ID
-    */
+    /**
+       * Generates a unique ID
+       * @returns {number} - A unique ID with the specified length
+   */
     generate(): number,
-     /**
-        * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
-        * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
-    */
+    /**
+       * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
+       * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
+   */
     test(): boolean,
+    /**
+    * The `runUUID` function generates a large number of unique IDs and checks for duplicates. It also
+    * measures the time taken to generate the unique IDs.
+    * @param - `idsLength` an optional parameter which specifies the number of
+    * unique IDs to generate. If `idsLength` is not provided, it defaults to 100000.
+    */
+    runUUID(idsLength?: number): void
 }
 
 type TUUID<Prefix extends string> = TString<Prefix> | TNumber
@@ -256,15 +307,22 @@ function UUID<Prefix extends string>(options?: TUUIDOptions<Prefix>): TUUID<Pref
     const uniqueID = new UniqueID(options?.prefix || "", options && options.type ? options.type : "string");
     return {
         /**
-         * The generate method generates a unique ID based on the options provided. If no options are provided, it generates a unique ID with a length of 16    characters and a type of "string"
-         * @returns {string | number} A unique ID
+         * Generates a unique ID
+         * @returns {string | number} A unique ID with the specified prefix and length
         */
-        generate: () => uniqueID.generate(options?.length) as any,
+        generate: () => uniqueID.generate(options?.length ?? 24) as any,
         /**
         * The test method tests the uniqueness of the unique ID algorithm by generating a large number of unique IDs and checking for duplicates
         * @returns {boolean} A boolean that indicates whether the list of generated unique IDs are unique or not
         */
         test: () => uniqueID.testUniqueID(),
+        /**
+            * The `runUUID` function generates a large number of unique IDs and checks for duplicates. It also
+            * measures the time taken to generate the unique IDs.
+            * @param - `idsLength` an optional parameter which specifies the number of
+            * unique IDs to generate. If `idsLength` is not provided, it defaults to 100000.
+        */
+        runUUID: (idsLength?: number) => uniqueID.runUUID({ length: options?.length, idsLength: idsLength })
     }
 }
 
